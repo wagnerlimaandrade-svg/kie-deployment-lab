@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kie-runtime
+  namespace: kie-dev
+  labels:
+    app.kubernetes.io/name: kie-runtime
+    app.kubernetes.io/part-of: kie-local
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: kie-runtime
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

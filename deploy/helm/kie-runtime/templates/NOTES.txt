@@ -1,0 +1,9 @@
+Para acessar {{ include "kie-runtime.fullname" . }} localmente:
+
+  kubectl -n {{ .Release.Namespace }} port-forward service/{{ include "kie-runtime.fullname" . }} 8080:{{ .Values.service.port }}
+
+Em outro terminal, inicie o processo BPMN:
+
+  curl -i -X POST http://localhost:8080/hello \
+    -H "Content-Type: application/json" \
+    -d '{}'

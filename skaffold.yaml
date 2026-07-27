@@ -1,0 +1,40 @@
+apiVersion: skaffold/v4beta14
+kind: Config
+
+build:
+  artifacts:
+    - image: kie-runtime-local
+      context: app
+      docker:
+        dockerfile: Dockerfile
+  tagPolicy:
+    sha256: {}
+  local:
+    push: false
+
+manifests:
+  helm:
+    releases:
+      - name: kie-runtime
+        chartPath: deploy/helm/kie-runtime
+        namespace: kie-dev
+        createNamespace: true
+        wait: true
+        valuesFiles:
+          - deploy/helm/kie-runtime/values-local.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_kie_runtime_local}}"
+          image.tag: "{{.IMAGE_TAG_kie_runtime_local}}@{{.IMAGE_DIGEST_kie_runtime_local}}"
+        setValues:
+          image.pullPolicy: IfNotPresent
+
+deploy:
+  helm: {}
+
+portForward:
+  - resourceType: service
+    resourceName: kie-runtime
+    namespace: kie-dev
+    port: 8080
+    localPort: 8080
+    address: 127.0.0.1

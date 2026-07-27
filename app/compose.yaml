@@ -1,0 +1,14 @@
+services:
+  kie-runtime:
+    image: kie-runtime-local:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://localhost:8080/q/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s

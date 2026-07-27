@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kie-runtime
+description: Helm chart for the local KIE BPMN runtime
+type: application
+version: 0.1.0
+appVersion: "0.0.0"
