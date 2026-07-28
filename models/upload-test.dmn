@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+  id="Definitions_UploadTest"
+  name="Upload Test"
+  namespace="https://kie.apache.org/examples/upload-test">
+  <inputData id="Input_Name" name="Name">
+    <variable id="InputVariable_Name" name="Name" typeRef="string"/>
+  </inputData>
+  <decision id="Decision_Greeting" name="Greeting">
+    <variable id="DecisionVariable_Greeting" name="Greeting" typeRef="string"/>
+    <informationRequirement>
+      <requiredInput href="#Input_Name"/>
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_Greeting">
+      <text>"Hello " + Name</text>
+    </literalExpression>
+  </decision>
+</definitions>

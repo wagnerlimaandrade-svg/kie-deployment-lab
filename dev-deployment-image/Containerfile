@@ -1,0 +1,37 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements. See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership. The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License. You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+FROM docker.io/apache/incubator-kie-sandbox-dev-deployment-quarkus-blank-app:main
+
+USER 0
+WORKDIR /home/app
+
+# The upstream runtime starts Quarkus with Maven offline after receiving the
+# model ZIP. Populate the repository from the base image's own POM so this
+# derivative remains aligned when the mutable :main tag changes versions.
+RUN ./mvnw --batch-mode --no-transfer-progress \
+      -Dmaven=3.9.11 \
+      -s=/tmp/kogito/.m2/settings.xml \
+      -Dmaven.repo.local=/tmp/kogito/.m2/repository \
+      -DskipTests \
+      clean package quarkus:go-offline
+
+# Keep the image compatible with Kubernetes' arbitrary/non-root UID model.
+RUN chgrp -R 0 /tmp/kogito/.m2/repository \
+ && chmod -R g=u /tmp/kogito/.m2/repository
+
+USER 185

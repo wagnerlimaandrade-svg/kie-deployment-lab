@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  id="Definitions_UploadTest"
+  targetNamespace="https://kie.apache.org/examples/upload-test">
+  <bpmn2:process
+    id="upload_test"
+    name="Upload Test"
+    processType="Public"
+    isExecutable="true">
+    <bpmn2:startEvent id="StartEvent">
+      <bpmn2:outgoing>Flow_StartToEnd</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:endEvent id="EndEvent">
+      <bpmn2:incoming>Flow_StartToEnd</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow
+      id="Flow_StartToEnd"
+      sourceRef="StartEvent"
+      targetRef="EndEvent"/>
+  </bpmn2:process>
+</bpmn2:definitions>

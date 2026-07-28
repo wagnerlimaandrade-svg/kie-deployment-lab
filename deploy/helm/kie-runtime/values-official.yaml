@@ -1,0 +1,46 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/apache/incubator-kie-sandbox-dev-deployment-quarkus-blank-app
+  tag: main
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+containerPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 4Gi
+
+livenessProbe:
+  httpGet: null
+  tcpSocket:
+    port: http
+  failureThreshold: 60
+
+readinessProbe:
+  httpGet: null
+  tcpSocket:
+    port: http
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 185
+  runAsGroup: 0
+  seccompProfile:
+    type: RuntimeDefault
+
+uploadService:
+  enabled: true
+  existingSecret: kie-dev-deployment-upload
+  secretKeyName: api-key
+  extractToDirectory: ""
+  port: 8080
+  rootPath: ""

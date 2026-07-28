@@ -38,3 +38,23 @@ portForward:
     port: 8080
     localPort: 8080
     address: 127.0.0.1
+
+profiles:
+  - name: official
+    patches:
+      - op: replace
+        path: /build/artifacts/0
+        value:
+          image: kie-dev-deployment-offline
+          context: dev-deployment-image
+          docker:
+            dockerfile: Containerfile
+      - op: replace
+        path: /manifests/helm/releases/0/valuesFiles/0
+        value: deploy/helm/kie-runtime/values-official.yaml
+      - op: replace
+        path: /manifests/helm/releases/0/setValueTemplates/image.repository
+        value: "{{.IMAGE_REPO_kie_dev_deployment_offline}}"
+      - op: replace
+        path: /manifests/helm/releases/0/setValueTemplates/image.tag
+        value: "{{.IMAGE_TAG_kie_dev_deployment_offline}}@{{.IMAGE_DIGEST_kie_dev_deployment_offline}}"

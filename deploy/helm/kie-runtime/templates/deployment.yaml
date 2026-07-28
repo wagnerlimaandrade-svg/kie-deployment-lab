@@ -38,7 +38,28 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.extraEnv }}
+          {{- if or .Values.uploadService.enabled .Values.extraEnv }}
           env:
+            {{- if .Values.uploadService.enabled }}
+            - name: DEV_DEPLOYMENT__UPLOAD_SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "uploadService.existingSecret is required when uploadService.enabled=true" .Values.uploadService.existingSecret | quote }}
+                  key: {{ required "uploadService.secretKeyName is required when uploadService.enabled=true" .Values.uploadService.secretKeyName | quote }}
+            - name: DEV_DEPLOYMENT__UPLOAD_SERVICE_PORT
+              value: {{ .Values.uploadService.port | quote }}
+            {{- with .Values.uploadService.extractToDirectory }}
+            - name: DEV_DEPLOYMENT__UPLOAD_SERVICE_EXTRACT_TO_DIR
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.uploadService.rootPath }}
+            - name: ROOT_PATH
+              value: {{ . | quote }}
+            - name: DEV_DEPLOYMENT__UPLOAD_SERVICE_ROOT_PATH
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}

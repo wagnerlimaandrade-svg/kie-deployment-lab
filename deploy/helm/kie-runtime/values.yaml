@@ -56,3 +56,11 @@ securityContext:
       - ALL
 
 extraEnv: []
+
+uploadService:
+  enabled: false
+  existingSecret: ""
+  secretKeyName: api-key
+  extractToDirectory: ""
+  port: 8080
+  rootPath: ""
