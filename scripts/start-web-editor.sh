@@ -2,12 +2,13 @@
 
 set -euo pipefail
 
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly LAB_CONTEXT="${KIE_LAB_CONTEXT:-kind-kie-local}"
 readonly LAB_CLUSTER_NAME="${KIE_LAB_CLUSTER_NAME:-kie-local}"
 readonly LAB_NAMESPACE="${KIE_LAB_EDITOR_NAMESPACE:-local-kie-sandbox-dev-deployments}"
 readonly LAB_INGRESS_PORT="${KIE_LAB_INGRESS_PORT:-8081}"
 readonly EDITOR_PORT="${KIE_LAB_EDITOR_PORT:-9001}"
-readonly UPSTREAM_REPO="${KIE_TOOLS_REPO:-../upstream-kie-tools}"
+readonly UPSTREAM_REPO="${KIE_TOOLS_REPO:-${SCRIPT_DIR}/../../upstream-kie-tools}"
 readonly EDITOR_PACKAGE="${UPSTREAM_REPO}/packages/online-editor"
 readonly CLUSTER_RESOURCES="${EDITOR_PACKAGE}/static/dev-deployments/kubernetes/cluster-config/kie-sandbox-dev-deployments-resources.yaml"
 readonly LAB_OFFLINE_IMAGE="${KIE_LAB_OFFLINE_IMAGE:-kie-dev-deployment-offline:latest}"
