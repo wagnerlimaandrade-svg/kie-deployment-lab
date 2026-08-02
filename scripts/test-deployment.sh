@@ -7,6 +7,10 @@ readonly NAMESPACE="kie-dev"
 readonly APP_LABEL="app.kubernetes.io/instance=kie-runtime"
 readonly LOCAL_PORT="8080"
 readonly REMOTE_PORT="8080"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# shellcheck source=scripts/lib/platform.sh
+source "${SCRIPT_DIR}/lib/platform.sh"
 
 port_forward_pid=""
 temp_dir="$(mktemp -d)"
@@ -14,10 +18,7 @@ port_forward_log="${temp_dir}/port-forward.log"
 openapi_file="${temp_dir}/openapi.yaml"
 
 cleanup() {
-  if [[ -n "${port_forward_pid}" ]] && kill -0 "${port_forward_pid}" 2>/dev/null; then
-    kill "${port_forward_pid}" 2>/dev/null || true
-    wait "${port_forward_pid}" 2>/dev/null || true
-  fi
+  kie_lab_stop_process "${port_forward_pid}"
   rm -rf "${temp_dir}"
 }
 trap cleanup EXIT INT TERM

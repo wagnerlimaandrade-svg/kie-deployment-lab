@@ -44,6 +44,13 @@ Não é necessário instalar Maven globalmente: o Maven Wrapper está incluído.
 ./mvnw clean package
 ```
 
+No Windows, use o wrapper nativo a partir de Git Bash, PowerShell ou CMD:
+
+```text
+mvnw.cmd clean test
+mvnw.cmd clean package
+```
+
 O build gera um fast-jar Quarkus em `target/quarkus-app`.
 
 ## Executar
@@ -57,6 +64,12 @@ Para desenvolvimento:
 ```bash
 ./mvnw quarkus:dev
 ```
+No Windows:
+
+```text
+mvnw.cmd quarkus:dev
+```
+
 
 A aplicação escuta em `0.0.0.0:8080` e não configura root path customizado.
 

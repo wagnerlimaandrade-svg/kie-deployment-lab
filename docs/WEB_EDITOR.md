@@ -1,6 +1,6 @@
 # Editor web integrado ao runtime do lab
 
-O lab usa o KIE Sandbox do checkout irmão `upstream-kie-tools`. O editor roda
+O lab usa a imagem publicada do KIE Sandbox e recursos Kubernetes versionados neste repositório. O editor roda
 em `http://localhost:9001`; uma ponte local expõe o Ingress do cluster
 `kind-kie-local` em `http://localhost:8081`. Essa mesma origem atende:
 
@@ -12,21 +12,18 @@ a partir do host da conexão Kubernetes.
 
 ## Iniciar
 
-Confirme primeiro os pré-requisitos do upstream, principalmente Node 24, pnpm
-10.34.4, Maven 3.9.11 e Java 17. Então, na raiz do lab:
+Confirme primeiro os pré-requisitos Docker, Kind e kubectl. Então, na raiz do lab:
 
 ```bash
-scripts/start-web-editor.sh
+bash scripts/start-web-editor.sh
 ```
 
-Se o checkout upstream estiver em outro caminho:
+A imagem padrão do editor é
+`docker.io/apache/incubator-kie-sandbox-webapp:main`. Para usar outra imagem,
+defina `KIE_LAB_EDITOR_IMAGE`; não é necessário ter um checkout do KIE Tools.
 
-```bash
-KIE_TOOLS_REPO=/caminho/para/upstream-kie-tools \
-  scripts/start-web-editor.sh
-```
-
-O comando reaplica o manifesto Kubernetes versionado no upstream, valida o
+O comando reaplica o manifesto Kubernetes local
+`kind/kie-sandbox-dev-deployments-resources.yaml`, valida o
 proxy da API, inicia o port-forward do Ingress e inicia o editor caso ele ainda
 não esteja ativo. Se `http://localhost:9001/env.json` já responder, o processo
 existente é reutilizado.

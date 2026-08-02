@@ -3,6 +3,12 @@
 set -euo pipefail
 set +x
 
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPOSITORY_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# shellcheck source=scripts/lib/platform.sh
+source "${SCRIPT_DIR}/lib/platform.sh"
+
 readonly CLUSTER_NAME="kie-local"
 readonly EXPECTED_CONTEXT="kind-${CLUSTER_NAME}"
 readonly NAMESPACE="kie-dev"
@@ -14,15 +20,12 @@ temp_dir="$(mktemp -d)"
 port_forward_pid=""
 
 cleanup() {
-  if [[ -n "${port_forward_pid}" ]] && kill -0 "${port_forward_pid}" 2>/dev/null; then
-    kill "${port_forward_pid}" 2>/dev/null || true
-    wait "${port_forward_pid}" 2>/dev/null || true
-  fi
+  kie_lab_stop_process "${port_forward_pid}"
   rm -rf "${temp_dir}"
 }
 trap cleanup EXIT INT TERM
 
-for command_name in curl docker kind kubectl skaffold zip unzip; do
+for command_name in curl docker kind kubectl skaffold; do
   if ! command -v "${command_name}" >/dev/null 2>&1; then
     echo "ERROR: required command not found: ${command_name}" >&2
     exit 1
@@ -53,9 +56,9 @@ kubectl create namespace "${NAMESPACE}" \
   --output=yaml |
   kubectl apply -f -
 
-scripts/create-upload-secret.sh
-scripts/package-models.sh
-skaffold run -p official
+bash "${SCRIPT_DIR}/create-upload-secret.sh"
+bash "${SCRIPT_DIR}/package-models.sh"
+(cd "${REPOSITORY_ROOT}" && skaffold run -p official)
 
 # A new pod guarantees that the one-shot upload service is available even
 # when the playbook is executed repeatedly with an unchanged image digest.
@@ -88,14 +91,11 @@ if ! grep -q "Forwarding from" "${temp_dir}/upload-port-forward.log"; then
   exit 1
 fi
 
-scripts/upload-models.sh
+bash "${SCRIPT_DIR}/upload-models.sh"
 
 # The upload server exits while Quarkus compiles, which closes this first
 # port-forward. That transition is expected; the smoke test opens a new one.
-if kill -0 "${port_forward_pid}" 2>/dev/null; then
-  kill "${port_forward_pid}" 2>/dev/null || true
-  wait "${port_forward_pid}" 2>/dev/null || true
-fi
+kie_lab_stop_process "${port_forward_pid}"
 port_forward_pid=""
 
 echo "Waiting for Quarkus to finish the offline compilation..."
@@ -109,7 +109,7 @@ while (( SECONDS < deadline )); do
   if [[ -n "${pod_name}" ]] &&
     kubectl -n "${NAMESPACE}" logs "${pod_name}" 2>/dev/null |
       grep -q "Listening on: http://0.0.0.0:8080"; then
-    scripts/test-deployment.sh
+    bash "${SCRIPT_DIR}/test-deployment.sh"
     echo "Official dev deployment completed successfully."
     exit 0
   fi

@@ -5,7 +5,7 @@ compilação Maven offline e os endpoints Quarkus. O caminho recomendado é:
 
 ```bash
 export DEV_DEPLOYMENT_UPLOAD_API_KEY='<chave-local-forte>'
-scripts/deploy-official.sh
+bash scripts/deploy-official.sh
 ```
 
 O script cria o cluster Kind `kie-local` se necessário, seleciona o contexto
@@ -15,8 +15,11 @@ A chave não é impressa nem gravada no Git.
 
 ## Pré-requisitos
 
-- Linux com Docker disponível;
-- `kind`, `kubectl`, `skaffold`, `curl`, `zip` e `unzip`;
+- Linux ou Windows 10/11 com Git Bash e Docker Desktop configurado para Linux
+  containers;
+- `kind`, `kubectl`, `skaffold` e `curl`;
+- `zip` e `unzip` no Linux; no Windows, o script usa o `tar.exe` incluído no
+  sistema;
 - pelo menos 4 GiB disponíveis para o container do runtime;
 - acesso à internet no primeiro build para Maven e imagens Docker.
 
@@ -62,8 +65,8 @@ kubectl config use-context kind-kie-local
 kubectl create namespace kie-dev
 
 export DEV_DEPLOYMENT_UPLOAD_API_KEY='<chave-local-forte>'
-scripts/create-upload-secret.sh
-scripts/package-models.sh
+bash scripts/create-upload-secret.sh
+bash scripts/package-models.sh
 skaffold run -p official
 
 kubectl -n kie-dev port-forward service/kie-runtime 8080:8080
@@ -73,7 +76,7 @@ Em outro terminal:
 
 ```bash
 export DEV_DEPLOYMENT_UPLOAD_API_KEY='<a-mesma-chave>'
-scripts/upload-models.sh
+bash scripts/upload-models.sh
 ```
 
 Durante a transição do servidor de upload para o Quarkus, a porta 8080 fecha
@@ -100,7 +103,7 @@ curl --fail http://127.0.0.1:8080/q/openapi
 Ou use o smoke test, que gerencia seu próprio port-forward:
 
 ```bash
-scripts/test-deployment.sh
+bash scripts/test-deployment.sh
 ```
 
 ## Fluxo local sem upload
@@ -109,7 +112,7 @@ O perfil padrão continua independente:
 
 ```bash
 skaffold run
-scripts/test-deployment.sh
+bash scripts/test-deployment.sh
 ```
 
 Ele constrói `app/Dockerfile` e é apropriado para o modelo fixo incluído em

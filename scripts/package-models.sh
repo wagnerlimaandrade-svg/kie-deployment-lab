@@ -7,7 +7,17 @@ readonly MODELS_DIRECTORY="${REPOSITORY_ROOT}/models"
 readonly BUILD_DIRECTORY="${REPOSITORY_ROOT}/build"
 readonly ARCHIVE="${BUILD_DIRECTORY}/models.zip"
 
-for command_name in find sort zip unzip; do
+# shellcheck source=scripts/lib/platform.sh
+source "${REPOSITORY_ROOT}/scripts/lib/platform.sh"
+
+required_commands=(find sort)
+if kie_lab_is_windows_bash; then
+  required_commands+=(tar.exe cygpath)
+else
+  required_commands+=(zip unzip)
+fi
+
+for command_name in "${required_commands[@]}"; do
   if ! command -v "${command_name}" >/dev/null 2>&1; then
     echo "ERROR: required command not found: ${command_name}" >&2
     exit 1
@@ -33,10 +43,21 @@ fi
 mkdir -p "${BUILD_DIRECTORY}"
 rm -f "${ARCHIVE}"
 
-(
-  cd "${MODELS_DIRECTORY}"
-  zip -q "${ARCHIVE}" "${model_files[@]}"
-)
+if kie_lab_is_windows_bash; then
+  native_archive="$(kie_lab_native_path "${ARCHIVE}")"
+  (
+    cd "${MODELS_DIRECTORY}"
+    MSYS2_ARG_CONV_EXCL='*' tar.exe -a -c -f "${native_archive}" "${model_files[@]}"
+  )
 
-echo "Created ${ARCHIVE} with:"
-unzip -l "${ARCHIVE}"
+  echo "Created ${ARCHIVE} with:"
+  MSYS2_ARG_CONV_EXCL='*' tar.exe -t -f "${native_archive}"
+else
+  (
+    cd "${MODELS_DIRECTORY}"
+    zip -q "${ARCHIVE}" "${model_files[@]}"
+  )
+
+  echo "Created ${ARCHIVE} with:"
+  unzip -l "${ARCHIVE}"
+fi
